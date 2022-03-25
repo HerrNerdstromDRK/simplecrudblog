@@ -4,8 +4,9 @@ type BlogPost
   @model
   @auth(
     rules: [
-      { allow: public, operations: [read] }
-      { allow: owner, provider: userPools }
+      { allow: owner }
+      { allow: public, provider: iam, operations: [read] }
+      { allow: groups, groups: ["everyone"], operations: [read] }
     ]
   ) {
   id: ID!
