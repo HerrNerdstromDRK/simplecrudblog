@@ -1,0 +1,20 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-simplecrudblog-dev-165722-authRole",
+      "UnauthRoleArn": "arn:aws:iam::813913549924:role/amplify-simplecrudblog-dev-165722-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::813913549924:role/amplify-simplecrudblog-dev-165722-authRole",
+      "Region": "us-east-2",
+      "DeploymentBucketName": "amplify-simplecrudblog-dev-165722-deployment",
+      "UnauthRoleName": "amplify-simplecrudblog-dev-165722-unauthRole",
+      "StackName": "amplify-simplecrudblog-dev-165722",
+      "StackId": "arn:aws:cloudformation:us-east-2:813913549924:stack/amplify-simplecrudblog-dev-165722/8e7b1970-ac86-11ec-ab13-0a7eca5ee532",
+      "AmplifyAppId": "dvyv6dux77ryc"
+    },
+    "categories": {
+      "auth": {
+        "simplecrudbloge8de9603": {}
+      }
+    }
+  }
+}
