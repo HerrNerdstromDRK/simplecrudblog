@@ -36,6 +36,12 @@ const theme = {
   ],
 };
 
+/**
+ * Render the site
+ * Wrap it in the Authenticator to enable authentication
+ * Use the AppNavigation component to navigate between the
+ * authentication page and blog home page.
+ */
 ReactDOM.render(
   <React.StrictMode>
     <Authenticator.Provider>

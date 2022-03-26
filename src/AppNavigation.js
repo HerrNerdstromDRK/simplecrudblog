@@ -1,14 +1,7 @@
 import { Amplify } from "aws-amplify";
 import React, { Component } from "react";
-import {
-  Link,
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  Navigate,
-} from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
-import { Authenticator, Heading, Text, Button } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 
 import awsExports from "./aws-exports";
@@ -17,6 +10,10 @@ import Login from "./Login";
 
 Amplify.configure(awsExports);
 
+/**
+ * Set the navigation between / (blog homepage) and
+ * Login (for authentication).
+ */
 const AppNavigation = () => (
   <Router>
     <Routes>
