@@ -1,19 +1,24 @@
+// Import the React hooks
 import React, { useState, useEffect } from "react";
 import "./App.css";
 
-import { Amplify, API, Auth } from "aws-amplify";
+import { Amplify, API } from "aws-amplify";
 import { useNavigate } from "react-router-dom";
+
+// GraphQL queries (read-only)
 import { listBlogPosts } from "./graphql/queries";
+
+// GraphQL mutators
 import {
   createBlogPost as createBlogPostMutation,
   deleteBlogPost as deleteBlogPostMutation,
   updateBlogPost as updateBlogPostMutation,
 } from "./graphql/mutations.js";
 
+// Import the AWS Amplify hooks and components
 import {
   useTheme,
   useAuthenticator,
-  Authenticator,
   Badge,
   Button,
   ButtonGroup,
@@ -28,24 +33,26 @@ import {
   View,
 } from "@aws-amplify/ui-react";
 
+// Import styles and app basics
 import "@aws-amplify/ui-react/styles.css";
 import awsExports from "./aws-exports";
 Amplify.configure(awsExports);
 
-// blogInitialFormState is used to record interim updates to the text fields for creating or updating
-// a blog entry.
+// blogInitialFormState is used as the default values for blog entries
 const blogInitialFormState = { title: "Blog Title", content: "Blog Content" };
 
 // Just for fun -- source of random images to attach to the blog entries
 const imageURL = "https://picsum.photos/200";
 
-function IsAuthenticated() {
-  const { route } = useAuthenticator((context) => [context.route]);
-  return route === "authenticated";
-}
-
+/**
+ * Default function with primary logic for the app.
+ */
 export default function Home() {
+  // These hooks must be in a particular order for React to function properly
+  // blogPosts holds the array of blogPosts for display
   const [blogPosts, setBlogPosts] = useState([]);
+
+  // blogFormData records the title and content of blog posts being created or changed
   const [blogFormData, setBlogFormData] = useState(blogInitialFormState);
 
   // viewBlogPost refers to the blogPost currently in the view pane
@@ -63,7 +70,10 @@ export default function Home() {
 
   const { tokens } = useTheme();
 
+  // The authenticator is used to login/logout a user and provide status
   const { user, signOut } = useAuthenticator((context) => [context.user]);
+
+  // Route is used to navigate between pages
   const { route } = useAuthenticator((context) => [context.route]);
   const navigate = useNavigate();
 
@@ -73,25 +83,20 @@ export default function Home() {
     fetchBlogPosts();
   }, []);
 
-  const AuthFunction = () => {
-    //    console.log("AuthFunction> isLoggedIn: " + authProps.isLoggedIn);
-    return (
-      <Authenticator>
-        {({ signOut, user }) => (
-          <main>
-            <h1>Hello {user.username}</h1>
-            <button onClick={signOut}>Sign out</button>
-          </main>
-        )}
-      </Authenticator>
-    );
-  };
+  // Set the document/page title
+  useEffect(() => {
+    document.title = "Simple CRUD Blog";
+  }, []);
 
   // Return true if a user is logged in; false otherwise.
   const isAuthenticated = () => {
     return route === "authenticated";
   };
 
+  // Potential bug in AWS Amplify -- the graphQL schema and amplify configuration is setup
+  // to allow unauthenticated users to conduct read operations (listBlogPosts), however
+  // it just doesn't seem to work for the initial startup in an unauthenticated state.
+  // This work around fixes the problem. *shrug*
   if (isAuthenticated()) {
     Amplify.configure({
       aws_appsync_authenticationType: "AMAZON_COGNITO_USER_POOLS",
@@ -146,21 +151,23 @@ export default function Home() {
       variables: { input: blogFormData },
     });
 
-    fetchBlogPosts();
-
     // Add the new blog post to the local copy of the list of blog entries
     setBlogPosts([...blogPosts, blogFormData]);
     //		console.log( 'createBlogPost> blogPosts: ' + blogPosts ) ;
 
+    // Do a pull from the db to ensure the blog posts are synchronized.
+    // Probably wouldn't do this in production, but useful for dev/test.
+    fetchBlogPosts();
+
     // Reset the blogFormData tracking variable
     setBlogFormData(blogInitialFormState);
-    console.log(
-      "createBlogPost> blogInitialFormState: {" +
-        blogInitialFormState.title +
-        ", " +
-        blogInitialFormState.content +
-        "}"
-    );
+    //    console.log(
+    //      "createBlogPost> blogInitialFormState: {" +
+    //        blogInitialFormState.title +
+    //        ", " +
+    //        blogInitialFormState.content +
+    //        "}"
+    //   );
     console.log(
       "createBlogPost> blogFormData: {" +
         blogFormData.title +
@@ -211,6 +218,8 @@ export default function Home() {
     });
 
     // If the blog being updated is also being viewed, update the view also
+    // There's probably a better way in React to link these two fields, but
+    // this will do for now.
     if (updateId === viewBlogPost.id) {
       setViewBlogPost(blogFormData);
     }
@@ -268,6 +277,8 @@ export default function Home() {
     console.log(
       "blogContentTextAreaField> blogPostContent: " + blogPostContent
     );
+    // Had to split this into two because I couldn't figure out a good way to include
+    // an onChange() handler as a conditional
     if (!isAuthenticated()) {
       return (
         <Flex as="form" direction="column">
@@ -276,21 +287,15 @@ export default function Home() {
             direction="row"
             hasError={false}
             isDisabled={true}
+            isReadOnly={true}
             isRequired={false}
             label="Blog Content"
             labelHidden={false}
             name="blogContent"
-            placeholder="Blog Content Goes Here :)"
+            placeholder="Login to create or update blog"
             rows="8"
-            value="Login to create or update blog"
             wrap="wrap"
             resize="vertical"
-            onChange={(e) =>
-              setBlogFormData({
-                ...blogFormData,
-                content: e.currentTarget.value,
-              })
-            }
           />
         </Flex>
       );
@@ -308,7 +313,7 @@ export default function Home() {
             name="blogContent"
             placeholder="Blog Content Goes Here :)"
             rows="8"
-            value={blogPostContent}
+            defaultValue={blogPostContent}
             wrap="wrap"
             resize="vertical"
             onChange={(e) =>
@@ -323,6 +328,9 @@ export default function Home() {
     }
   }
 
+  /**
+   * Logic to build the deleteBlogPostButton based on authentication state.
+   */
   function deleteBlogPostButton(blogPost) {
     if (isAuthenticated() && user.username === blogPost.owner) {
       return (
@@ -335,6 +343,9 @@ export default function Home() {
     }
   }
 
+  /**
+   * Logic to build the updateBlogPostButton based on authentication state.
+   */
   function updateBlogPostButton(blogPost) {
     if (isAuthenticated() && user.username === blogPost.owner) {
       return (
@@ -419,29 +430,12 @@ export default function Home() {
     );
   }
 
-  const Login = () => {
-    console.log("Login>");
-    //    return (
-    //      <Authenticator variation="modal">
-    //        {({ signOut }) => <button onClick={signOut}>Sign out</button>}
-    //      </Authenticator>
-    //    );
-    return Auth.signIn();
-  };
-
-  // const Login = () => <Authenticator />;
-
-  const handleStateChange = (state) => {
-    console.log("handleStateChange.handleStateChange> state: " + state);
-    if (state === "signedIn") {
-      console.log("handleStateChange> signedIn event");
-
-      //      this.props.onUserSignIn();
-    }
-  };
-
+  /**
+   * Returns the login or logout button for the blog header, depending on current
+   * authentication state.
+   */
   const getLoginOrLogoutButton = () => {
-    if (IsAuthenticated()) {
+    if (isAuthenticated()) {
       return (
         <Button size="small" onClick={signOut}>
           Sign Out
@@ -453,7 +447,6 @@ export default function Home() {
           Sign In
         </Button>
       );
-      //      return <Authenticator variation="modal" />;
     }
   };
 
@@ -466,7 +459,7 @@ export default function Home() {
         <center>
           <Heading level={1}>Basic CRUD Blog</Heading>
           <Text>
-            {IsAuthenticated() ? (
+            {isAuthenticated() ? (
               <Text>Welcome {user.username}!</Text>
             ) : (
               "Please login to create or update blog posts"
@@ -504,7 +497,7 @@ export default function Home() {
         <div className="App">
           <input
             placeholder="Blog Title"
-            value="Login to create or update blog"
+            defaultValue="Login to create or update blog"
           />
           {blogContentTextAreaField(blogFormData.content)}
         </div>
@@ -535,6 +528,9 @@ export default function Home() {
     }
   };
 
+  // Default return for the Home function() is to build a grid
+  // for the page with the header, blog list on the left, and
+  // blog view and create/update blog controls on the right
   return (
     <Grid
       templateColumns={{ base: "1fr", large: "1fr 1fr" }}
@@ -542,6 +538,7 @@ export default function Home() {
       gap="var(--amplify-space-small)"
     >
       <View
+        key="blogHeaderView"
         columnSpan={2}
         backgroundColor={tokens.colors.background.secondary}
         padding={tokens.space.medium}
@@ -549,6 +546,7 @@ export default function Home() {
         {getBlogHeader()}
       </View>
       <View
+        key="blogPostListView"
         rowSpan={2}
         backgroundColor={tokens.colors.background.secondary}
         padding={tokens.space.medium}
@@ -556,6 +554,7 @@ export default function Home() {
         {blogPosts.map((blogPost) => BlogPostCard(blogPost))}
       </View>
       <ScrollView
+        key="viewBlogScrollView"
         orientation="vertical"
         backgroundColor={tokens.colors.background.secondary}
         padding={tokens.space.medium}
@@ -564,6 +563,7 @@ export default function Home() {
         <Text>Content: {viewBlogPost.content}</Text>
       </ScrollView>
       <View
+        key="createOrUpdateBlogView"
         backgroundColor={tokens.colors.background.secondary}
         padding={tokens.space.medium}
       >
