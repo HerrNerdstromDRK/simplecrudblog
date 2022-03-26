@@ -2,12 +2,15 @@
 
 type BlogPost
   @model
-  @aws_iam
-  @aws_cognito_user_pools
   @auth(
     rules: [
-      { allow: owner, operations: [create, read, update, delete] }
-      { allow: public, provider: iam, operations: [read] }
+      # allow all authenticated users ability to create posts
+      # allow owners ability to update and delete their posts
+      { allow: owner }
+      # allow all authenticated users to read posts
+      { allow: private, operations: [read] }
+      # allow all guest users (not authenticated) to read posts
+      { allow: public, operations: [read] }
     ]
   ) {
   id: ID!

@@ -92,6 +92,16 @@ export default function Home() {
     return route === "authenticated";
   };
 
+  if (isAuthenticated()) {
+    Amplify.configure({
+      aws_appsync_authenticationType: "AMAZON_COGNITO_USER_POOLS",
+    });
+  } else {
+    Amplify.configure({
+      aws_appsync_authenticationType: "API_KEY",
+    });
+  }
+
   /**
    * Retrieve all blog posts from the API and display to the user.
    */
@@ -135,6 +145,8 @@ export default function Home() {
       query: createBlogPostMutation,
       variables: { input: blogFormData },
     });
+
+    fetchBlogPosts();
 
     // Add the new blog post to the local copy of the list of blog entries
     setBlogPosts([...blogPosts, blogFormData]);
@@ -256,28 +268,87 @@ export default function Home() {
     console.log(
       "blogContentTextAreaField> blogPostContent: " + blogPostContent
     );
-    return (
-      <Flex as="form" direction="column">
-        <TextAreaField
-          autoComplete="off"
-          direction="row"
-          hasError={false}
-          isDisabled={false}
-          isRequired={false}
-          label="Blog Content"
-          labelHidden={false}
-          name="blogContent"
-          placeholder="Blog Content Goes Here :)"
-          rows="8"
-          value={blogPostContent}
-          wrap="wrap"
-          resize="vertical"
-          onChange={(e) =>
-            setBlogFormData({ ...blogFormData, content: e.currentTarget.value })
-          }
-        />
-      </Flex>
-    );
+    if (!isAuthenticated()) {
+      return (
+        <Flex as="form" direction="column">
+          <TextAreaField
+            autoComplete="off"
+            direction="row"
+            hasError={false}
+            isDisabled={true}
+            isRequired={false}
+            label="Blog Content"
+            labelHidden={false}
+            name="blogContent"
+            placeholder="Blog Content Goes Here :)"
+            rows="8"
+            value="Login to create or update blog"
+            wrap="wrap"
+            resize="vertical"
+            onChange={(e) =>
+              setBlogFormData({
+                ...blogFormData,
+                content: e.currentTarget.value,
+              })
+            }
+          />
+        </Flex>
+      );
+    } else {
+      return (
+        <Flex as="form" direction="column">
+          <TextAreaField
+            autoComplete="off"
+            direction="row"
+            hasError={false}
+            isDisabled={false}
+            isRequired={false}
+            label="Blog Content"
+            labelHidden={false}
+            name="blogContent"
+            placeholder="Blog Content Goes Here :)"
+            rows="8"
+            value={blogPostContent}
+            wrap="wrap"
+            resize="vertical"
+            onChange={(e) =>
+              setBlogFormData({
+                ...blogFormData,
+                content: e.currentTarget.value,
+              })
+            }
+          />
+        </Flex>
+      );
+    }
+  }
+
+  function deleteBlogPostButton(blogPost) {
+    if (isAuthenticated() && user.username === blogPost.owner) {
+      return (
+        <Button size="small" onClick={() => deleteBlogPost(blogPost)}>
+          Delete Blog Post
+        </Button>
+      );
+    } else {
+      return "";
+    }
+  }
+
+  function updateBlogPostButton(blogPost) {
+    if (isAuthenticated() && user.username === blogPost.owner) {
+      return (
+        <Button
+          size="small"
+          isDisabled={isUpdate}
+          onClick={() => initiateBlogPostUpdate(blogPost)}
+        >
+          Update Blog Post
+        </Button>
+      );
+    } else {
+      return "";
+    }
   }
 
   /**
@@ -300,7 +371,7 @@ export default function Home() {
         <Card>
           <Flex direction="row" alignItems="flex-start">
             <Image
-              alt="Road to milford sound"
+              alt="Random Image"
               src={imageURL + "?random=" + blogPost.id}
               width="20%"
             />
@@ -334,16 +405,9 @@ export default function Home() {
                   : blogPost.content}
               </TextAreaField>
               <ButtonGroup justification="center" variation="primary">
-                <Button size="small" onClick={() => deleteBlogPost(blogPost)}>
-                  Delete Blog Post
-                </Button>
-                <Button
-                  size="small"
-                  isDisabled={isUpdate}
-                  onClick={() => initiateBlogPostUpdate(blogPost)}
-                >
-                  Update Blog Post
-                </Button>
+                {deleteBlogPostButton(blogPost)}
+                {updateBlogPostButton(blogPost)}
+
                 <Button size="small" onClick={() => setViewBlogPost(blogPost)}>
                   View Blog Post
                 </Button>
@@ -435,28 +499,40 @@ export default function Home() {
         blogFormData.content
     );
 */
-    return (
-      <div className="App">
-        <input
-          onChange={(e) =>
-            setBlogFormData({
-              ...blogFormData,
-              title: e.target.value,
-            })
-          }
-          placeholder="Blog Title"
-          value={blogFormData.title}
-        />
-        {blogContentTextAreaField(blogFormData.content)}
-        <Button
-          variation="primary"
-          size="small"
-          onClick={isUpdate ? updateBlogPost : createBlogPost}
-        >
-          {isUpdate ? "Update Blog Post" : "Create Blog Post"}
-        </Button>
-      </div>
-    );
+    if (!isAuthenticated()) {
+      return (
+        <div className="App">
+          <input
+            placeholder="Blog Title"
+            value="Login to create or update blog"
+          />
+          {blogContentTextAreaField(blogFormData.content)}
+        </div>
+      );
+    } else {
+      return (
+        <div className="App">
+          <input
+            onChange={(e) =>
+              setBlogFormData({
+                ...blogFormData,
+                title: e.target.value,
+              })
+            }
+            placeholder="Blog Title"
+            value={blogFormData.title}
+          />
+          {blogContentTextAreaField(blogFormData.content)}
+          <Button
+            variation="primary"
+            size="small"
+            onClick={isUpdate ? updateBlogPost : createBlogPost}
+          >
+            {isUpdate ? "Update Blog Post" : "Create Blog Post"}
+          </Button>
+        </div>
+      );
+    }
   };
 
   return (

@@ -15,6 +15,7 @@ export type AmplifyDependentResourcesAttributes = {
     },
     "api": {
         "simplecrudblog": {
+            "GraphQLAPIKeyOutput": "string",
             "GraphQLAPIIdOutput": "string",
             "GraphQLAPIEndpointOutput": "string"
         }
