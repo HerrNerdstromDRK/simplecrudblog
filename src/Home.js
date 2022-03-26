@@ -99,12 +99,16 @@ export default function Home() {
     console.log("fetchBlogPosts");
     // Run the listBlogPosts() query from the GraphQL API to retrieve all current
     //  blog posts
-    const apiData = await API.graphql({ query: listBlogPosts });
+    const apiData = await API.graphql({
+      query: listBlogPosts,
+      error: (error) =>
+        console.log("fetchBlogPosts> Error: " + JSON.stringify(error)),
+    });
 
     // Convenience variable to store all of the blog post items
     const blogPostsFromAPI = apiData.data.listBlogPosts.items;
 
-    //    console.log("fetchBlogPosts> blogPostsFromAPI: " + blogPostsFromAPI);
+    console.log("fetchBlogPosts> blogPostsFromAPI: " + blogPostsFromAPI);
 
     // Update the local cop of the blogPosts using the API pull
     setBlogPosts(blogPostsFromAPI);

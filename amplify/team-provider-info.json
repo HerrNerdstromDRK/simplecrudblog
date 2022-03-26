@@ -15,13 +15,6 @@
     "categories": {
       "auth": {
         "simplecrudbloge8de9603": {}
-      },
-      "function": {
-        "simplecrudbloge8de9603PostConfirmation": {
-          "GROUP": "everyone",
-          "deploymentBucketName": "amplify-simplecrudblog-dev-165722-deployment",
-          "s3Key": "amplify-builds/simplecrudbloge8de9603PostConfirmation-334e516b6b52326c4661-build.zip"
-        }
       }
     }
   }
