@@ -2,37 +2,47 @@
   text-align: center;
 }
 
-.Home-logo {
-  height: 40vmin;
-  pointer-events: none;
+.container {
+  display: grid;
+  grid-template-areas:
+    "header header"
+    "blogposts blogview"
+    "blogposts createblog";
+  grid-template-columns: 1fr 3fr;
+  gap: 10px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .Home-logo {
-    animation: Home-logo-spin infinite 20s linear;
-  }
+.container-flex-content-and-create {
+  display: flex; /* or inline-flex */
+  flex-flow: row wrap;
+  min-width: 100%;
+
+  /* Then we define how is distributed the remaining space */
+  justify-content: space-around;
 }
 
-.Home-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.container-flex-content-and-create-child {
+  margin: auto; /* Magic! */
+  min-width: 100%;
+  border: 10px solid blue;
 }
 
-.Home-link {
-  color: #61dafb;
+header {
+  grid-area: header;
 }
 
-@keyframes Home-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+blogposts {
+  grid-area: blogposts;
+}
+
+blogview {
+  grid-area: blogview;
+}
+
+createblog {
+  grid-area: createblog;
+}
+
+.amplify-card {
+  border: 10px solid blue;
 }

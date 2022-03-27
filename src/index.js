@@ -6,35 +6,9 @@ import Amplify from "aws-amplify";
 import config from "./aws-exports";
 import { Authenticator } from "@aws-amplify/ui-react";
 
-import { defaultTheme } from "@aws-amplify/ui-react";
 import AppNavigation from "./AppNavigation";
 
 Amplify.configure(config);
-
-// Step 1: Create a new Theme with your custom values
-const theme = {
-  name: "dark-mode-theme",
-  overrides: [
-    {
-      colorMode: "dark",
-      tokens: {
-        colors: {
-          neutral: {
-            // flipping the neutral palette
-            10: defaultTheme.tokens.colors.neutral[100],
-            20: defaultTheme.tokens.colors.neutral[90],
-            40: defaultTheme.tokens.colors.neutral[80],
-            80: defaultTheme.tokens.colors.neutral[40],
-            90: defaultTheme.tokens.colors.neutral[20],
-            100: defaultTheme.tokens.colors.neutral[10],
-          },
-          black: { value: "#fff" },
-          white: { value: "#000" },
-        },
-      },
-    },
-  ],
-};
 
 /**
  * Render the site

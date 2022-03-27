@@ -1,6 +1,6 @@
 // Import the React hooks
 import React, { useState, useEffect } from "react";
-import "./App.css";
+import "./Home.css";
 
 import { Amplify, API } from "aws-amplify";
 import { useNavigate } from "react-router-dom";
@@ -30,11 +30,13 @@ import {
   Image,
   Text,
   TextAreaField,
+  TextField,
   View,
 } from "@aws-amplify/ui-react";
 
 // Import styles and app basics
 import "@aws-amplify/ui-react/styles.css";
+import "./w3-theme-dark-grey.css";
 import awsExports from "./aws-exports";
 Amplify.configure(awsExports);
 
@@ -152,7 +154,7 @@ export default function Home() {
     });
 
     // Add the new blog post to the local copy of the list of blog entries
-    setBlogPosts([...blogPosts, blogFormData]);
+    //    setBlogPosts([...blogPosts, blogFormData]);
     //		console.log( 'createBlogPost> blogPosts: ' + blogPosts ) ;
 
     // Do a pull from the db to ensure the blog posts are synchronized.
@@ -274,56 +276,54 @@ export default function Home() {
    * field in the blogFormData variable.
    */
   function blogContentTextAreaField(blogPostContent) {
-    console.log(
-      "blogContentTextAreaField> blogPostContent: " + blogPostContent
-    );
+    //    console.log(
+    //      "blogContentTextAreaField> blogPostContent: " + blogPostContent
+    //    );
     // Had to split this into two because I couldn't figure out a good way to include
     // an onChange() handler as a conditional
     if (!isAuthenticated()) {
       return (
-        <Flex as="form" direction="column">
-          <TextAreaField
-            autoComplete="off"
-            direction="row"
-            hasError={false}
-            isDisabled={true}
-            isReadOnly={true}
-            isRequired={false}
-            label="Blog Content"
-            labelHidden={false}
-            name="blogContent"
-            placeholder="Login to create or update blog"
-            rows="8"
-            wrap="wrap"
-            resize="vertical"
-          />
-        </Flex>
+        <TextAreaField
+          autoComplete="off"
+          direction="row"
+          hasError={false}
+          isDisabled={true}
+          isReadOnly={true}
+          isRequired={false}
+          label="Blog Content"
+          labelHidden={true}
+          name="blogContent"
+          value={blogFormData.content}
+          placeholder="Login to create or update blog"
+          rows="8"
+          wrap="wrap"
+          resize="vertical"
+        />
       );
     } else {
       return (
-        <Flex as="form" direction="column">
-          <TextAreaField
-            autoComplete="off"
-            direction="row"
-            hasError={false}
-            isDisabled={false}
-            isRequired={false}
-            label="Blog Content"
-            labelHidden={false}
-            name="blogContent"
-            placeholder="Blog Content Goes Here :)"
-            rows="8"
-            defaultValue={blogPostContent}
-            wrap="wrap"
-            resize="vertical"
-            onChange={(e) =>
-              setBlogFormData({
-                ...blogFormData,
-                content: e.currentTarget.value,
-              })
-            }
-          />
-        </Flex>
+        <TextAreaField
+          autoComplete="off"
+          direction="row"
+          hasError={false}
+          isDisabled={false}
+          isRequired={false}
+          label="Blog Content"
+          labelHidden={true}
+          name="blogContent"
+          placeholder="Blog Content Goes Here :)"
+          rows="8"
+          defaultValue="Blog Content Goes Here :)"
+          wrap="wrap"
+          value={blogFormData.content}
+          resize="vertical"
+          onChange={(e) =>
+            setBlogFormData({
+              ...blogFormData,
+              content: e.currentTarget.value,
+            })
+          }
+        />
       );
     }
   }
@@ -375,10 +375,7 @@ export default function Home() {
     //        blogPost.content
     //    );
     return (
-      <View
-        backgroundColor={tokens.colors.background.secondary}
-        padding={tokens.space.medium}
-      >
+      <View padding={tokens.space.xs}>
         <Card>
           <Flex direction="row" alignItems="flex-start">
             <Image
@@ -491,31 +488,47 @@ export default function Home() {
         ", blogFormData.content: " +
         blogFormData.content
     );
-*/
+    */
     if (!isAuthenticated()) {
       return (
-        <div className="App">
-          <input
-            placeholder="Blog Title"
-            defaultValue="Login to create or update blog"
+        <div>
+          <TextField
+            alignItems="baseline"
+            direction="row"
+            isReadOnly={true}
+            label="Blog Title"
+            labelHidden={false}
+            isDisabled={true}
+            name="blogTitle"
+            value={blogFormData.title}
+            placeholder="Login to create or update blog"
+            rows="8"
           />
-          {blogContentTextAreaField(blogFormData.content)}
+          <p>{blogContentTextAreaField(blogFormData.content)}</p>
         </div>
       );
     } else {
       return (
-        <div className="App">
-          <input
+        <div>
+          <TextField
+            alignItems="baseline"
+            direction="row"
+            isReadOnly={false}
+            label="Blog Title"
+            labelHidden={false}
+            isDisabled={false}
+            name="blogTitle"
+            value={blogFormData.title}
+            placeholder="Login to create or update blog"
+            rows="8"
             onChange={(e) =>
               setBlogFormData({
                 ...blogFormData,
                 title: e.target.value,
               })
             }
-            placeholder="Blog Title"
-            value={blogFormData.title}
           />
-          {blogContentTextAreaField(blogFormData.content)}
+          <p>{blogContentTextAreaField(blogFormData.content)}</p>
           <Button
             variation="primary"
             size="small"
@@ -533,42 +546,39 @@ export default function Home() {
   // blog view and create/update blog controls on the right
   return (
     <Grid
+      className="amplify-grid"
       templateColumns={{ base: "1fr", large: "1fr 1fr" }}
       templateRows={{ base: "repeat(4, 10rem)", large: "repeat(3, 10rem)" }}
       gap="var(--amplify-space-small)"
     >
-      <View
-        key="blogHeaderView"
-        columnSpan={2}
-        backgroundColor={tokens.colors.background.secondary}
-        padding={tokens.space.medium}
-      >
+      <View key="blogHeaderView" padding={tokens.space.medium}>
         {getBlogHeader()}
       </View>
-      <View
-        key="blogPostListView"
-        rowSpan={2}
-        backgroundColor={tokens.colors.background.secondary}
-        padding={tokens.space.medium}
-      >
+      <View key="blogPostListView" padding={tokens.space.medium}>
         {blogPosts.map((blogPost) => BlogPostCard(blogPost))}
       </View>
-      <ScrollView
-        key="viewBlogScrollView"
-        orientation="vertical"
-        backgroundColor={tokens.colors.background.secondary}
-        padding={tokens.space.medium}
-      >
-        <Text>Title: {viewBlogPost.title}</Text>
-        <Text>Content: {viewBlogPost.content}</Text>
-      </ScrollView>
-      <View
-        key="createOrUpdateBlogView"
-        backgroundColor={tokens.colors.background.secondary}
-        padding={tokens.space.medium}
-      >
-        {renderCreateOrUpdateBlogView()}
-      </View>
+      <Flex className="container-flex-content-and-create">
+        <ScrollView
+          className="container-flex-content-and-create-child"
+          key="viewBlogScrollView"
+          orientation="vertical"
+          padding={tokens.space.medium}
+        >
+          <Text>
+            <b>Title:</b> {viewBlogPost.title}
+          </Text>
+          <Text>
+            <b>Content:</b> {viewBlogPost.content}
+          </Text>
+        </ScrollView>
+        <View
+          className="container-flex-content-and-create-child"
+          key="createOrUpdateBlogView"
+          padding={tokens.space.medium}
+        >
+          {renderCreateOrUpdateBlogView()}
+        </View>
+      </Flex>
     </Grid>
   );
 }
