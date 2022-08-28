@@ -87,7 +87,7 @@ export default function Home() {
 
   // Set the document/page title
   useEffect(() => {
-    document.title = "Simple Test CRUD Blog";
+    document.title = "Simple Test CRUD Blog (useEffect)";
   }, []);
 
   // Return true if a user is logged in; false otherwise.
@@ -454,7 +454,7 @@ export default function Home() {
     return (
       <>
         <center>
-          <Heading level={1}>Simple CRUD Blog</Heading>
+          <Heading level={1}>Simple Test (getBlogHeader())</Heading>
           <Text>
             {isAuthenticated() ? (
               <Text>Welcome {user.username}!</Text>
