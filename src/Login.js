@@ -1,6 +1,6 @@
 import React from "react";
 import { withAuthenticator } from "@aws-amplify/ui-react";
-import { Route, useNavigate } from "react-router-dom";
+import { /* Route, */ useNavigate } from "react-router-dom";
 
 function Login({ user }) {
   const navigate = useNavigate();
