@@ -87,7 +87,7 @@ export default function Home() {
 
   // Set the document/page title
   useEffect(() => {
-    document.title = "Simple CRUD Blog";
+    document.title = "Simple Test CRUD Blog";
   }, []);
 
   // Return true if a user is logged in; false otherwise.
