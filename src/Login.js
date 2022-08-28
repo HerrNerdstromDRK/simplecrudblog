@@ -7,7 +7,7 @@ function Login({ user }) {
   console.log("Login");
   return (
     <React.Fragment>
-      <h1>Welcome {user.username}!</h1>
+      <h1>Test Welcome {user.username}!</h1>
       <button onClick={() => navigate("/")}>Go to blog page</button>
     </React.Fragment>
   );
