@@ -454,7 +454,7 @@ export default function Home() {
     return (
       <>
         <center>
-          <Heading level={1}>Simple Test (getBlogHeader())</Heading>
+          <Heading level={1}>Simple CRUD Blog</Heading>
           <Text>
             {isAuthenticated() ? (
               <Text>Welcome {user.username}!</Text>

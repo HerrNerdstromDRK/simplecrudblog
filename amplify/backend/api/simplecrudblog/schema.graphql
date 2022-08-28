@@ -17,3 +17,4 @@ type BlogPost
   title: String!
   content: String!
 }
+ 
