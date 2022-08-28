@@ -379,7 +379,7 @@ export default function Home() {
         <Card>
           <Flex direction="row" alignItems="flex-start">
             <Image
-              alt="Random Image"
+              alt="Pseudo-Random Image"
               src={imageURL + "?random=" + blogPost.id}
               width="20%"
             />
